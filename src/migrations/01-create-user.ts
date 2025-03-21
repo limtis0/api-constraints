@@ -1,3 +1,4 @@
+import { balanceNonNegativeConstraint } from '@/models/user';
 import { QueryInterface, DataTypes } from 'sequelize';
 
 export async function up({ context: queryInterface }: { context: QueryInterface }) {
@@ -18,7 +19,7 @@ export async function up({ context: queryInterface }: { context: QueryInterface 
     // Add CHECK constraint separately
     await queryInterface.sequelize.query(`
     ALTER TABLE "Users"
-    ADD CONSTRAINT balance_non_negative CHECK (balance >= 0);
+    ADD CONSTRAINT ${balanceNonNegativeConstraint} CHECK (balance >= 0);
   `);
 }
 

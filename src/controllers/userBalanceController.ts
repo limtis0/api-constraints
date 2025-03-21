@@ -1,8 +1,9 @@
-import { User } from "@/models/user";
+import { balanceNonNegativeConstraint, User } from "@/models/user";
 import { validate } from "@/utils/validate";
 import { Request, Router } from "express";
 import { AllowedSchema } from "express-json-validator-middleware";
 import asyncHandler from "express-async-handler";
+import { DatabaseError } from "sequelize";
 
 const router = Router();
 
@@ -34,14 +35,21 @@ router.post('/user/:id/balance/increment', validate({
     params: changeBalanceParamsSchema,
     body: changeBalanceBodySchema
 }), asyncHandler(async (req: ChangeBalanceRequest, res) => {
-    await User.increment('balance',
-        {
-            by: req.body.amount,
-            where: {
-                id: req.params.id
+    try {
+        await User.increment('balance',
+            {
+                by: req.body.amount,
+                where: {
+                    id: req.params.id
+                }
             }
+        );
+    }
+    catch (e) {
+        if (e instanceof DatabaseError) {
+            console.log(e.message);
         }
-    );
+    }
 
     res.status(200).send();
 }));
@@ -50,14 +58,24 @@ router.post('/user/:id/balance/decrement', validate({
     params: changeBalanceParamsSchema,
     body: changeBalanceBodySchema
 }), asyncHandler(async (req: ChangeBalanceRequest, res) => {
-    await User.decrement('balance',
-        {
-            by: req.body.amount,
-            where: {
-                id: req.params.id
+    try {
+        await User.decrement('balance',
+            {
+                by: req.body.amount,
+                where: {
+                    id: req.params.id
+                }
+            }
+        );
+    }
+    catch (error) {
+        if (error instanceof DatabaseError && Object.keys(error.original).includes('constraint')) {
+            if (error.original['constraint'] === balanceNonNegativeConstraint) {
+                res.status(403).send({ error: 'Insufficient balance.' });
+                return;
             }
         }
-    );
+    }
 
     res.status(200).send();
 }));

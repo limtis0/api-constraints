@@ -13,6 +13,8 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
     public balance!: number;
 }
 
+export const balanceNonNegativeConstraint = 'balance_non_negative';
+
 User.init(
     {
         id: {
