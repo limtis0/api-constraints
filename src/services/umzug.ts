@@ -1,6 +1,6 @@
 import { Umzug, SequelizeStorage } from 'umzug';
 import { sequelize } from '@/services/sequelize';
-import { down as createUserDown, up as createUserUp } from '@/migrations/01-create-user';
+import { createUserDown, createUserUp } from '@/migrations/01-create-user';
 
 export const umzug = new Umzug({
     migrations: [

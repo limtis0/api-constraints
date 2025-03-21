@@ -1,7 +1,7 @@
 import { balanceNonNegativeConstraint } from '@/models/user';
 import { QueryInterface, DataTypes } from 'sequelize';
 
-export async function up({ context: queryInterface }: { context: QueryInterface }) {
+export async function createUserUp({ context: queryInterface }: { context: QueryInterface }) {
     await queryInterface.createTable('Users', {
         id: {
             type: DataTypes.INTEGER,
@@ -23,6 +23,6 @@ export async function up({ context: queryInterface }: { context: QueryInterface 
   `);
 }
 
-export async function down({ context: queryInterface }: { context: QueryInterface }) {
+export async function createUserDown({ context: queryInterface }: { context: QueryInterface }) {
     await queryInterface.dropTable('Users');
 }
