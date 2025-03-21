@@ -1,7 +1,11 @@
+import healthzController from '@/controllers/healthzController';
+import userBalanceController from '@/controllers/userBalanceController';
 import { sequelize } from "@/services/sequelize";
 import { umzug } from "@/services/umzug";
 import express from "express";
 import { createTestUser } from "./utils/createTestUser";
+import { validationErrorHandler } from './middlewares/validationErrorHandler';
+import { generalErrorHandler } from './middlewares/generalErrorHandler';
 
 async function runMigrations() {
     try {
@@ -20,9 +24,15 @@ async function startExpressServer() {
     const app = express();
     const port = Number(process.env.API_PORT);
 
-    app.get('/healthz', (_, res) => {
-        res.status(200).send('OK');
-    });
+    app.use(express.json());
+
+    // Controllers
+    app.use(healthzController);
+    app.use(userBalanceController);
+
+    // Middlewares
+    app.use(validationErrorHandler);
+    app.use(generalErrorHandler);
 
     app.listen(port, async () => {
         console.log(`Server is running at port ${port}.`);

@@ -5,5 +5,6 @@ export async function createTestUser() {
         { id: 1, balance: 10_000 },
     );
 
+    console.log(`Upserted a test user with id ${user.id}`);
     return user;
 }
