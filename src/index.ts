@@ -1,5 +1,6 @@
 import { sequelize } from "@/services/sequelize";
 import { umzug } from "@/services/umzug";
+import express from "express";
 
 async function runMigrations() {
     try {
@@ -8,16 +9,23 @@ async function runMigrations() {
 
         await umzug.up();
         console.log("Migrations executed.");
-
-        process.exit(0);
     } catch (err) {
         console.error("Error:", err);
         process.exit(1);
     }
 }
 
-async function main() {
-    await runMigrations();
+async function startExpressServer() {
+    const app = express();
+    const port = Number(process.env.API_PORT);
+
+    app.get('/healthz', (_, res) => {
+        res.status(200).send('OK');
+    });
+
+    app.listen(port, async () => {
+        console.log(`Server is running at port ${port}.`);
+    });
 }
 
-main();
+runMigrations().then(startExpressServer);
