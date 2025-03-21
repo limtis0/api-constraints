@@ -1,14 +1,15 @@
 import { sequelize } from "@/services/sequelize";
 import { umzug } from "@/services/umzug";
 import express from "express";
+import { createTestUser } from "./utils/createTestUser";
 
 async function runMigrations() {
     try {
         await sequelize.authenticate();
         console.log("Database connected.");
 
-        await umzug.up();
-        console.log("Migrations executed.");
+        const executed = await umzug.up();
+        console.log('Executed migrations:', executed.map(m => m.name));
     } catch (err) {
         console.error("Error:", err);
         process.exit(1);
@@ -28,4 +29,4 @@ async function startExpressServer() {
     });
 }
 
-runMigrations().then(startExpressServer);
+runMigrations().then(createTestUser).then(startExpressServer);
